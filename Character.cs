@@ -8,36 +8,69 @@ namespace ConsoleApplication3
 {
     public class Character
     {
+        public Faction Faction;
+        public Party Party;
+
         public string Name;
+        public int Distance;
         public int HP;
         public int MaxHP;
         public int AttackDamage;
-        public int AP;
-        public int APRechargeRate;
-        public string LastAction = "Charging";
+        public float AP;
+        public float APRechargeRate;
+        public string LastAction = string.Empty;
         public bool IsAlive;
 
-        public List<Action> ActionList = new List<Action>();
+        public Character currentTarget;
+        //private Action2 currentAction;
+
+        private int currentAction = -1;
+        public List<Action2> ActionList = new List<Action2>();
 
         public void Turn(Level level)
         {
-            AP += APRechargeRate;
-            if (AP > 100)
+            //check if ability is still valid
+            if (currentAction > -1 && !ActionList[currentAction].Ability.CanUse(level, this, currentTarget))
             {
-                AP = 100;
-                LastAction = "Idle";
+                //cancel
+                currentAction = -1;
+                AP = 0;
+                currentTarget = null;
             }
 
-            if (AP == 100)
+            //will check all actions or the 1 up to the currentAction (for canceling)
+            var maxAction = currentAction == -1 ? ActionList.Count : currentAction;            
+            for (var i = 0; i < maxAction; i++)
             {
-                foreach (var action in ActionList)
+                //found either a new action to run or higher priority action
+                if (ActionList[i].Check(level, this))
                 {
-                    if (action.Perform(this, level))
+                    if (currentAction > -1)
                     {
-                        AP = 0;
-                        break;
+                        //cancel (don't clear target because Check set the new one)
                     }
+
+                    currentAction = i;
+                    AP = 0;
+                    break;
                 }
+            }
+
+            if (currentAction > -1)
+            {
+                LastAction = ActionList[currentAction].Ability.GetType().Name + " " + currentTarget.Name;
+                AP += ActionList[currentAction].Ability.ChargeRate * APRechargeRate;
+                if (AP >= 100)
+                {
+                    ActionList[currentAction].Ability.Use(level, this, currentTarget);
+                    AP = 0;
+                    currentTarget = null;
+                    currentAction = -1;
+                }
+            }
+            else
+            {
+                LastAction = "Idle";
             }
         }
 
@@ -64,13 +97,18 @@ namespace ConsoleApplication3
             }
         }
 
-        public int APOver10 { get { return AP / 10; } }
+        public int APOver10 { get { return (int)(AP / 10); } }
 
         public int HPPercent { get { return (int)(100 * ((float)HP / (float)MaxHP)); } }
 
+        public bool IsAlly(Character other)
+        {
+            return !Faction.IsHostile(other.Faction);
+        }
+
         public override string ToString()
         {
-            if(IsAlive)
+            if (IsAlive)
                 return string.Format("{0,10} - HP: {1,3} {7,3}%, AD: {2,3}, AR: {6,2}, AP: [{3}{4}] {5}", Name, HP, AttackDamage, new string('#', APOver10), new string(' ', 10 - APOver10), LastAction, APRechargeRate, HPPercent);
 
             return string.Format("{0,10} - Dead!", Name);

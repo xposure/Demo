@@ -9,41 +9,51 @@ using ConsoleApplication3.Targets;
 
 namespace ConsoleApplication3
 {
+
+    public class Action2
+    {
+        public Condition2 Condition;
+        public Ability Ability;
+
+        public Action2(Condition2 condition, Ability ability)
+        {
+            Condition = condition;
+            Ability = ability;
+        }
+
+        public bool Check(Level level, Character actor)
+        {
+            return Condition(level, actor, Ability);
+        }
+    }
+
     public class Action
     {
         public Target Target;
         public Condition Condition;
         public Ability Ability;
 
-        public bool Perform(Character actor, Level level)
+        public Character FindValidTarget(Level level, Character actor)
         {
             var targets = Target.FindTargets(level, actor);
+            return targets.FirstOrDefault(x => Check(level, actor, x));
+        }
 
-            foreach (var target in targets)
-            {
-
-                if (!Condition.Check(level, target))
-                    continue;
-
-                if (!Ability.Use(level, actor, target))
-                    continue;
-
-                return true;
-            }
-
-            return false;
+        public bool Check(Level level, Character actor, Character target)
+        {
+            return Condition.Check(level, target) && Ability.CanUse(level, actor, target);
         }
 
         public static readonly Action AttackNearestEnemy = new Action()
         {
-            Target = new TargetAliveEnemy(),
+            Target = new TargetClosestEnemy(),
             Condition = new ConditionAny(),
             Ability = new AbilityAttack()
         };
 
         public static readonly Action AttackNearestPlayer = new Action()
         {
-            Target = new TargetAlivePlayer(),
+            Target = new TargetClosestPlayer(),
             Condition = new ConditionAny(),
             Ability = new AbilityAttack()
         };

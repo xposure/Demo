@@ -8,14 +8,17 @@ namespace ConsoleApplication3.Abilities
 {
     public class AbilityAttack : Ability
     {
-        public override bool Use(Level level, Character actor, Character target)
+        public override bool CanUse(Level level, Character actor, Character target)
+        {
+            return target.IsAlive;
+        }
+
+        public override void Use(Level level, Character actor, Character target)
         {
             //Console.WriteLine("{0} is attacking {1} for {2} damage!", actor.Name, target.Name, actor.AttackDamage);
             var damage = (int)(actor.AttackDamage + level.rnd.Next(-2, 2));
             target.TakeDamage(damage);
-            actor.LastAction = string.Format("Attacked {0} for {1} damage!", target.Name, damage);
-            //if target.hp < 0 signal dead
-            return true;
+            //actor.LastAction = string.Format("Attacked {0} for {1} damage!", target.Name, damage);
         }
     }
 }
