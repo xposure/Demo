@@ -9,8 +9,8 @@ namespace ConsoleApplication3
     public class Level
     {
         public Random rnd = new Random();
-        public Party enemy;
-        public Party player;
+        public CharacterGroup enemy;
+        public CharacterGroup player;
 
         public IEnumerable<Character> Characters
         {

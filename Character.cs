@@ -9,7 +9,7 @@ namespace ConsoleApplication3
     public class Character
     {
         public Faction Faction;
-        public Party Party;
+        public CharacterGroup Party;
 
         public string Name;
         public int Distance;

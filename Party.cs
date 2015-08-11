@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication3
 {
-    public class Party : IEnumerable<Character>
+    public class CharacterGroup : IEnumerable<Character>
     {
         private Character[] partyMembers;
         private Character partyLeader;
@@ -15,6 +15,9 @@ namespace ConsoleApplication3
         {
             get
             {
+                //System.Diagnostics.Debug.Assert(partyLeader != null, "party leader was null");
+                //System.Diagnostics.Debug.Assert(partyLeader.IsAlive, "party leader was dead");
+
                 if (partyLeader == null || !partyLeader.IsAlive)
                 {
                     foreach (var member in this)
@@ -31,7 +34,7 @@ namespace ConsoleApplication3
             }
         }
 
-        public Party(Character[] _partyMembers)
+        public CharacterGroup(Character[] _partyMembers)
         {
             partyMembers = _partyMembers;
         }

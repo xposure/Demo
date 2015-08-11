@@ -5,10 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using ConsoleApplication3.Abilities;
 using ConsoleApplication3.Conditions;
-using ConsoleApplication3.Targets;
 
 namespace ConsoleApplication3
 {
+    /*
+     * Mechanics
+     *  - Action system like FF12
+     *  - 
+     * 
+     */
     //http://blog.gambrinous.com/2012/12/04/seabird-plunge-a-flash-game-with-source/
 
     public static class Program
@@ -42,7 +47,7 @@ namespace ConsoleApplication3
             //    Condition = new ConditionHPLessThan(75),
             //    Target = new TargetAliveEnemy(),
             //});
-            level.enemy = new Party(enemies.ToArray());
+            level.enemy = new CharacterGroup(enemies.ToArray());
 
             var players = new List<Character>();
             for (var i = 0; i < 3; i++)
@@ -65,7 +70,7 @@ namespace ConsoleApplication3
 
             players[0].APRechargeRate = 1.5f;
             players[0].ActionList.Add(new Action2(Condition.AllyAnyLessThan90, new AbilityHeal()));
-            level.player = new Party(players.ToArray());
+            level.player = new CharacterGroup(players.ToArray());
 
 
             var line = string.Empty;
