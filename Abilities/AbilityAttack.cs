@@ -10,7 +10,7 @@ namespace ConsoleApplication3.Abilities
     {
         public override bool CanUse(Level level, Character actor, Character target)
         {
-            return target.IsAlive;
+            return target != null && target.IsAlive;
         }
 
         public override void Use(Level level, Character actor, Character target)

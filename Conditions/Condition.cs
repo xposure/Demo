@@ -9,7 +9,7 @@ namespace ConsoleApplication3.Conditions
 {
     public delegate bool Condition2(Level level, Character actor, Ability ability);
 
-    public class Condition
+    public static class Condition
     {
         /*
          * Ally: Any                    -- check each ability can use, applies to all alies at all times
@@ -33,31 +33,40 @@ namespace ConsoleApplication3.Conditions
         public static readonly Condition2 AllyAnyLessThan90 = (l, c, a) => Any(l, c, a, l.Allies(c).Where(x => x.HPPercent < 90));
         public static readonly Condition2 FoeAny = (l, c, a) => Any(l, c, a, l.Foes(c));
         public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.Foes(c).OrderBy(x => Math.Abs(c.Distance - x.Distance)));
-        public static readonly Condition2 FoePartyLeaderTarget = (l, c, a) => Any(l, c, a, l.Foes(c).OrderBy(x => Math.Abs(c.Distance - x.Distance)));
+
+        public static bool FoePartyLeaderTarget(Level level, Character actor, Ability ability)
+        {
+            var leader = level.player.PartyLeader;
+            if (leader == null)
+                return false;
+
+            var target = leader.currentTarget;
+            if (target == null)
+                return false;
+
+            if (!target.Faction.IsHostile(actor.Faction))
+                return false;
+
+            if (ability.CanUse(level, actor, target))
+            {
+                actor.currentTarget = target;   
+                return true;
+            }
+
+            return false;
+        }
 
         public static bool Any(Level level, Character actor, Ability ability, IEnumerable<Character> targets)
         {
             foreach (var target in targets)
             {
-                if (ability.CanUse(level, actor, target))
+                if (target != null && ability.CanUse(level, actor, target))
                 {
                     actor.currentTarget = target;
                     return true;
                 }
             }
 
-            return false;
-        }
-
-        public static bool IsAlly(Level level, Character actor, Character target)
-        {
-            return actor.IsAlly(target);
-        }
-
-        //public static bool AnyAl
-
-        public virtual bool Check(Level level, Character target)
-        {
             return false;
         }
     }

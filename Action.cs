@@ -8,7 +8,6 @@ using ConsoleApplication3.Conditions;
 
 namespace ConsoleApplication3
 {
-
     public class Action2
     {
         public Condition2 Condition;

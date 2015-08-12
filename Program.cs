@@ -18,6 +18,7 @@ namespace ConsoleApplication3
 
     public static class Program
     {
+        static Random rand = new Random();
         static void Main(string[] args)
         {
             var level = new Level();
@@ -25,17 +26,8 @@ namespace ConsoleApplication3
             var enemies = new List<Character>();
             for (var i = 0; i < 5; i++)
             {
-                var ch = new Character()
-                {
-                    Name = "Enemy " + i,
-                    Faction = Faction.Foe,
-                    Distance = level.rnd.Next(10, 100),
-                    AttackDamage = level.rnd.Next(5, 15),
-                    HP = level.rnd.Next(75, 125),
-                    APRechargeRate = level.rnd.NextFloat(0.8f, 1.2f),
-                    IsAlive = true
-                };
-                ch.MaxHP = ch.HP;
+                var ch = CreateEnemy("Enemy " + i);
+
                 ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
                 //ch.ActionList.Add(Action.HealSelf);
                 enemies.Add(ch);
@@ -52,23 +44,16 @@ namespace ConsoleApplication3
             var players = new List<Character>();
             for (var i = 0; i < 3; i++)
             {
-                var ch = new Character()
-                {
-                    Name = "Player " + i,
-                    Faction = Faction.Ally,
-                    Distance = level.rnd.Next(10, 100),
-                    AttackDamage = level.rnd.Next(7, 17),
-                    HP = level.rnd.Next(175, 275),
-                    APRechargeRate = level.rnd.NextFloat(0.8f, 1.2f),
-                    IsAlive = true,
-                };
-                ch.MaxHP = ch.HP;
+                var ch = CreatePlayer("Player " + i);
+                if (i > 0)
+                    ch.ActionList.Add(new Action2(Condition.FoePartyLeaderTarget, new AbilityAttack()));
+
                 ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
                 //ch.ActionList.Add(Action.HealSelf);
                 players.Add(ch);
             }
 
-            players[0].APRechargeRate = 1.5f;
+            //players[0].APRechargeRate = 1.5f;
             players[0].ActionList.Add(new Action2(Condition.AllyAnyLessThan90, new AbilityHeal()));
             level.player = new CharacterGroup(players.ToArray());
 
@@ -101,13 +86,73 @@ namespace ConsoleApplication3
                     //if (player.IsAlive)
                         Console.WriteLine(player);
 
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(500);
             }
         }
 
         public static float NextFloat(this Random random, float min, float max)
         {
             return (float)(random.NextDouble() * (max - min) + min);
+        }
+
+        public static float NextFloat(this Random random)
+        {
+            return (float)random.NextDouble();
+        }
+
+        public static Character CreateEnemy(string name)
+        {
+            var ch = new Character()
+            {
+                Name = name,
+                Faction = Faction.Foe,
+                Distance = rand.Next(10, 100),
+                IsAlive = true
+            };
+
+            var stats = ch.Stats;
+            var hp = stats.AddBaseStat("hp_now", 50, 3);
+            stats.AddBaseStat("hp_max", hp);
+
+            var mp = stats.AddBaseStat("mp_now", 25, 3);
+            stats.AddBaseStat("mp_max", mp);
+
+            stats.AddBaseStat("attack_damage", 3, 3);
+            stats.AddBaseStat("strength", 5, 3);
+            stats.AddBaseStat("vitality", 5, 3);
+            stats.AddBaseStat("intellect", 5, 3);
+            stats.AddBaseStat("mind", 5, 3);
+            stats.AddBaseStat("speed", 3, 2);
+            
+            return ch;
+        }
+
+
+        public static Character CreatePlayer(string name)
+        {
+            var ch = new Character()
+            {
+                Name = name,
+                Faction = Faction.Ally,
+                Distance = rand.Next(10, 100),
+                IsAlive = true
+            };
+
+            var stats = ch.Stats;
+            var hp = stats.AddBaseStat("hp_now", 70, 3);
+            stats.AddBaseStat("hp_max", hp);
+
+            var mp = stats.AddBaseStat("mp_now", 35, 3);
+            stats.AddBaseStat("mp_max", mp);
+
+            stats.AddBaseStat("attack_damage", 4, 3);
+            stats.AddBaseStat("strength", 5, 3);
+            stats.AddBaseStat("vitality", 5, 3);
+            stats.AddBaseStat("intellect", 5, 3);
+            stats.AddBaseStat("mind", 5, 3);
+            stats.AddBaseStat("speed", 3, 2);
+
+            return ch;
         }
     }
 }

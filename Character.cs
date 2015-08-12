@@ -12,12 +12,10 @@ namespace ConsoleApplication3
         public CharacterGroup Party;
 
         public string Name;
+        public Stats Stats = new Stats();
+
         public int Distance;
-        public int HP;
-        public int MaxHP;
-        public int AttackDamage;
         public float AP;
-        public float APRechargeRate;
         public string LastAction = string.Empty;
         public bool IsAlive;
 
@@ -66,6 +64,7 @@ namespace ConsoleApplication3
                     AP = 0;
                     currentTarget = null;
                     currentAction = -1;
+                    Turn(level);
                 }
             }
             else
@@ -96,6 +95,25 @@ namespace ConsoleApplication3
                     HP = MaxHP;
             }
         }
+
+        public float HP
+        {
+            get { return Stats.GetBaseValue("hp_now"); }
+            set { Stats.SetBaseStat("hp_now", value); }
+        }
+
+        public float MaxHP {
+            get { return Stats.GetBaseValue("hp_max"); }
+            //set { Stats.SetBaseStat("hp_max", value); }
+        }
+
+        public float AttackDamage
+        {
+            get { return Stats.GetModifiedValue("attack_damage") * 2; }
+            //set { Stats.SetBaseStat("attack_damage", value);}
+        }
+
+        public float APRechargeRate { get { return Stats.GetModifiedValue("speed") / 4; } } 
 
         public int APOver10 { get { return (int)(AP / 10); } }
 
