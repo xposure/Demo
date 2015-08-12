@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using ConsoleApplication3.Abilities;
+using ConsoleApplication3.Conditions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,9 +13,11 @@ namespace ConsoleApplication3
     /// </summary>
     public class Game1 : Game
     {
+        Random rand = new Random();
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SpriteFont arialFont;
+        Level level = new Level();
 
         public Game1()
         {
@@ -33,6 +38,40 @@ namespace ConsoleApplication3
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            var enemies = new List<Character>();
+            for (var i = 0; i < 5; i++)
+            {
+                var ch = CreateEnemy("Enemy " + i);
+
+                ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
+                //ch.ActionList.Add(Action.HealSelf);
+                enemies.Add(ch);
+            }
+
+            //enemies[enemies.Count - 1].ActionList.Insert(0, new Action()
+            //{
+            //    Ability = new AbilityHeal(),
+            //    Condition = new ConditionHPLessThan(75),
+            //    Target = new TargetAliveEnemy(),
+            //});
+            level.enemy = new CharacterGroup(enemies.ToArray());
+
+            var players = new List<Character>();
+            for (var i = 0; i < 3; i++)
+            {
+                var ch = CreatePlayer("Player " + i);
+                if (i > 0)
+                    ch.ActionList.Add(new Action2(Condition.FoePartyLeaderTarget, new AbilityAttack()));
+
+                ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
+                //ch.ActionList.Add(Action.HealSelf);
+                players.Add(ch);
+            }
+
+            //players[0].APRechargeRate = 1.5f;
+            players[0].ActionList.Add(new Action2(Condition.AllyAnyLessThan90, new AbilityHeal()));
+            level.player = new CharacterGroup(players.ToArray());
         }
 
         /// <summary>
@@ -69,6 +108,21 @@ namespace ConsoleApplication3
 
             // TODO: Add your update logic here
 
+            foreach (var enemy in level.enemy)
+            {
+                if (enemy.IsAlive)
+                    enemy.Turn(level, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            }
+
+            foreach (var player in level.player)
+            {
+                if (player.IsAlive)
+                    player.Turn(level, (float)gameTime.ElapsedGameTime.TotalSeconds);
+            }
+
+            //Console.WriteLine();
+
+
             base.Update(gameTime);
         }
 
@@ -81,12 +135,18 @@ namespace ConsoleApplication3
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
+
+            foreach (var enemy in level.enemy)
+                enemy.Draw(spriteBatch);
+
+            foreach (var player in level.player)
+                player.Draw(spriteBatch);
+
             spriteBatch.DrawLine(
                 new Vector2(0, 0), 
                 new Vector2(200 + 100 * (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 200), 
                 Color.Red,
                 2);
-            spriteBatch.DrawRect(new Vector2(400, 400), 30, Color.Blue);
 
             spriteBatch.DrawString(arialFont, "hello world", new Vector2(0, 0), Color.Green);
 
@@ -94,5 +154,62 @@ namespace ConsoleApplication3
 
             base.Draw(gameTime);
         }
+
+
+        public Character CreateEnemy(string name)
+        {
+            var ch = new Character()
+            {
+                Name = name,
+                Faction = Faction.Foe,
+                Position = new Vector2(rand.NextFloat(0, 25) + 25, rand.NextFloat(0, 600)),
+                IsAlive = true
+            };
+
+            var stats = ch.Stats;
+            var hp = stats.AddBaseStat("hp_now", 50, 3);
+            stats.AddBaseStat("hp_max", hp);
+
+            var mp = stats.AddBaseStat("mp_now", 25, 3);
+            stats.AddBaseStat("mp_max", mp);
+
+            stats.AddBaseStat("attack_damage", 3, 3);
+            stats.AddBaseStat("strength", 5, 3);
+            stats.AddBaseStat("vitality", 5, 3);
+            stats.AddBaseStat("intellect", 5, 3);
+            stats.AddBaseStat("mind", 5, 3);
+            stats.AddBaseStat("speed", 3, 2);
+
+            return ch;
+        }
+
+
+        public Character CreatePlayer(string name)
+        {
+            var ch = new Character()
+            {
+                Name = name,
+                Faction = Faction.Ally,
+                Position = new Vector2(rand.NextFloat(0, 25) + 425, rand.NextFloat(0, 600)),
+                IsAlive = true
+            };
+
+            var stats = ch.Stats;
+            var hp = stats.AddBaseStat("hp_now", 70, 3);
+            stats.AddBaseStat("hp_max", hp);
+
+            var mp = stats.AddBaseStat("mp_now", 35, 3);
+            stats.AddBaseStat("mp_max", mp);
+
+            stats.AddBaseStat("attack_damage", 4, 3);
+            stats.AddBaseStat("strength", 5, 3);
+            stats.AddBaseStat("vitality", 5, 3);
+            stats.AddBaseStat("intellect", 5, 3);
+            stats.AddBaseStat("mind", 5, 3);
+            stats.AddBaseStat("speed", 3, 2);
+
+            return ch;
+        }
+
     }
 }

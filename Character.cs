@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace ConsoleApplication3
 {
@@ -14,7 +16,9 @@ namespace ConsoleApplication3
         public string Name;
         public Stats Stats = new Stats();
 
-        public int Distance;
+        public Vector2 Position;
+
+        //public int Distance;
         public float AP;
         public string LastAction = string.Empty;
         public bool IsAlive;
@@ -25,7 +29,7 @@ namespace ConsoleApplication3
         private int currentAction = -1;
         public List<Action2> ActionList = new List<Action2>();
 
-        public void Turn(Level level)
+        public void Turn(Level level, float dt)
         {
             //check if ability is still valid
             if (currentAction > -1 && !ActionList[currentAction].Ability.CanUse(level, this, currentTarget))
@@ -57,14 +61,14 @@ namespace ConsoleApplication3
             if (currentAction > -1)
             {
                 LastAction = ActionList[currentAction].Ability.GetType().Name + " " + currentTarget.Name;
-                AP += ActionList[currentAction].Ability.ChargeRate * APRechargeRate;
+                AP += ActionList[currentAction].Ability.ChargeRate * APRechargeRate * dt;
                 if (AP >= 100)
                 {
                     ActionList[currentAction].Ability.Use(level, this, currentTarget);
                     AP = 0;
                     currentTarget = null;
                     currentAction = -1;
-                    Turn(level);
+                    Turn(level, dt);
                 }
             }
             else
@@ -113,15 +117,40 @@ namespace ConsoleApplication3
             //set { Stats.SetBaseStat("attack_damage", value);}
         }
 
-        public float APRechargeRate { get { return Stats.GetModifiedValue("speed") / 5; } } 
+        public float APRechargeRate { get { return Stats.GetModifiedValue("speed"); } } 
 
         public int APOver10 { get { return (int)(AP / 10); } }
 
         public int HPPercent { get { return (int)(100 * ((float)HP / (float)MaxHP)); } }
 
+        public int Size { get { return 10; } }
+
+        public float Left { get { return Position.X - Size / 2; } }
+        public float Right { get { return Position.X + Size / 2; } }
+        public float Top { get { return Position.Y + Size / 2; } }
+        public float Bottom { get { return Position.Y - Size / 2; } }
+
         public bool IsAlly(Character other)
         {
             return !Faction.IsHostile(other.Faction);
+        }
+
+        public void Draw(SpriteBatch batch)
+        {
+            if (IsAlive)
+            {
+                var color = Faction == Faction.Ally ? Color.Blue : Color.Red;
+                if (currentTarget != null)
+                {
+                    var dir = currentTarget.Position - Position;
+                    //dir.Normalize();
+                    dir *= (AP / 100);
+
+                    batch.DrawLine(Position, Position + dir, color, 2);
+                }
+
+                batch.DrawRect(Position, 20, color);
+            }
         }
 
         public override string ToString()

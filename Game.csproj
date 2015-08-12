@@ -44,6 +44,7 @@
     <Compile Include="Action.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Conditions\Condition.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Faction.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Level.cs" />

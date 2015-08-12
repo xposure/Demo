@@ -32,7 +32,7 @@ namespace ConsoleApplication3.Conditions
         public static readonly Condition2 AllyAny = (l, c, a) => Any(l, c, a, l.Allies(c));
         public static readonly Condition2 AllyAnyLessThan90 = (l, c, a) => Any(l, c, a, l.Allies(c).Where(x => x.HPPercent < 90));
         public static readonly Condition2 FoeAny = (l, c, a) => Any(l, c, a, l.Foes(c));
-        public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.Foes(c).OrderBy(x => Math.Abs(c.Distance - x.Distance)));
+        public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.Foes(c).OrderBy(x => (c.Position - x.Position).LengthSquared()));
 
         public static bool FoePartyLeaderTarget(Level level, Character actor, Ability ability)
         {
