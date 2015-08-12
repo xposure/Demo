@@ -60,15 +60,33 @@ namespace ConsoleApplication3
 
             if (currentAction > -1)
             {
-                LastAction = ActionList[currentAction].Ability.GetType().Name + " " + currentTarget.Name;
-                AP += ActionList[currentAction].Ability.ChargeRate * APRechargeRate * dt;
-                if (AP >= 100)
+                var action = ActionList[currentAction];
+                var ability = action.Ability;
+
+                LastAction = ability.GetType().Name + " " + currentTarget.Name;
+
+                var distance = Vector2.Distance(Position, currentTarget.Position);
+                if (distance > ability.MaxDistance)
                 {
-                    ActionList[currentAction].Ability.Use(level, this, currentTarget);
-                    AP = 0;
-                    currentTarget = null;
-                    currentAction = -1;
-                    Turn(level, dt);
+                    //move closer
+                    var dir = (currentTarget.Position - Position);
+                    dir.Normalize();
+
+                    dir *= (dt * 100);
+                    Position += dir;
+                }
+                else
+                {
+                    AP += ability.ChargeRate * APRechargeRate * dt;
+
+                    if (AP >= 100)
+                    {
+                        ability.Use(level, this, currentTarget);
+                        AP = 0;
+                        currentTarget = null;
+                        currentAction = -1;
+                        Turn(level, dt);
+                    }
                 }
             }
             else
@@ -106,7 +124,8 @@ namespace ConsoleApplication3
             set { Stats.SetBaseStat("hp_now", value); }
         }
 
-        public float MaxHP {
+        public float MaxHP
+        {
             get { return Stats.GetBaseValue("hp_max"); }
             //set { Stats.SetBaseStat("hp_max", value); }
         }
@@ -117,7 +136,7 @@ namespace ConsoleApplication3
             //set { Stats.SetBaseStat("attack_damage", value);}
         }
 
-        public float APRechargeRate { get { return Stats.GetModifiedValue("speed"); } } 
+        public float APRechargeRate { get { return Stats.GetModifiedValue("speed"); } }
 
         public int APOver10 { get { return (int)(AP / 10); } }
 
@@ -140,8 +159,13 @@ namespace ConsoleApplication3
             if (IsAlive)
             {
                 var color = Faction == Faction.Ally ? Color.Blue : Color.Red;
+                batch.DrawRect(Position, 20, color);
+
                 if (currentTarget != null)
                 {
+                    if (!currentTarget.Faction.IsHostile(Faction))
+                        color = Color.Green;
+
                     var dir = currentTarget.Position - Position;
                     //dir.Normalize();
                     dir *= (AP / 100);
@@ -149,7 +173,6 @@ namespace ConsoleApplication3
                     batch.DrawLine(Position, Position + dir, color, 2);
                 }
 
-                batch.DrawRect(Position, 20, color);
             }
         }
 

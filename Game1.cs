@@ -40,7 +40,7 @@ namespace ConsoleApplication3
             base.Initialize();
 
             var enemies = new List<Character>();
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < 8; i++)
             {
                 var ch = CreateEnemy("Enemy " + i);
 
@@ -70,7 +70,7 @@ namespace ConsoleApplication3
             }
 
             //players[0].APRechargeRate = 1.5f;
-            players[0].ActionList.Add(new Action2(Condition.AllyAnyLessThan90, new AbilityHeal()));
+            players[players.Count - 1].ActionList.Insert(0, new Action2(Condition.AllyAnyLessThan50, new AbilityHeal()));
             level.player = new CharacterGroup(players.ToArray());
         }
 
@@ -120,6 +120,29 @@ namespace ConsoleApplication3
                     player.Turn(level, (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
 
+            var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var chars = new List<Character>(level.Characters);
+            for (var i = 0; i < chars.Count;i++)
+            {
+                for (var k = i + 1; k < chars.Count; k++)
+                {
+                    var left = chars[i];
+                    var right = chars[k];
+
+                    var distSq = (left.Size * left.Size + right.Size * right.Size) * 4;
+                    var distance = Vector2.DistanceSquared(left.Position, right.Position);
+                    if (distance < distSq)
+                    {
+                        var amount = 1f - (distSq / distance);
+                        var dir = left.Position - right.Position;
+                        dir.Normalize();
+
+                        left.Position += dir * dt * 100;
+                        right.Position -= dir * dt * 100;
+                    }
+                }
+            }
+
             //Console.WriteLine();
 
 
@@ -141,14 +164,6 @@ namespace ConsoleApplication3
 
             foreach (var player in level.player)
                 player.Draw(spriteBatch);
-
-            spriteBatch.DrawLine(
-                new Vector2(0, 0), 
-                new Vector2(200 + 100 * (float)Math.Sin(gameTime.TotalGameTime.TotalSeconds), 200), 
-                Color.Red,
-                2);
-
-            spriteBatch.DrawString(arialFont, "hello world", new Vector2(0, 0), Color.Green);
 
             spriteBatch.End();
 
@@ -201,7 +216,7 @@ namespace ConsoleApplication3
             var mp = stats.AddBaseStat("mp_now", 35, 3);
             stats.AddBaseStat("mp_max", mp);
 
-            stats.AddBaseStat("attack_damage", 4, 3);
+            stats.AddBaseStat("attack_damage", 6, 4);
             stats.AddBaseStat("strength", 5, 3);
             stats.AddBaseStat("vitality", 5, 3);
             stats.AddBaseStat("intellect", 5, 3);

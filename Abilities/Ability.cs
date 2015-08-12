@@ -8,7 +8,8 @@ namespace ConsoleApplication3.Abilities
 {
     public class Ability
     {
-        public float ChargeRate = 10;
+        public float ChargeRate = 20;
+        public int MaxDistance = 80;
 
         public virtual bool CanUse(Level level, Character actor, Character target)
         {
