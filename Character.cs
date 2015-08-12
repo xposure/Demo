@@ -113,7 +113,7 @@ namespace ConsoleApplication3
             //set { Stats.SetBaseStat("attack_damage", value);}
         }
 
-        public float APRechargeRate { get { return Stats.GetModifiedValue("speed") / 4; } } 
+        public float APRechargeRate { get { return Stats.GetModifiedValue("speed") / 5; } } 
 
         public int APOver10 { get { return (int)(AP / 10); } }
 
