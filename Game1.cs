@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using ConsoleApplication3.Abilities;
 using ConsoleApplication3.Conditions;
@@ -8,6 +9,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace ConsoleApplication3
 {
+    /*
+     * Animated Sprites - http://www.gamedev.net/topic/586876-pow-studios-free-sprite-animations/
+     * 
+     * 
+     */
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -40,7 +47,7 @@ namespace ConsoleApplication3
             base.Initialize();
 
             var enemies = new List<Character>();
-            for (var i = 0; i < 8; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var ch = CreateEnemy("Enemy " + i);
 
@@ -55,7 +62,8 @@ namespace ConsoleApplication3
             //    Condition = new ConditionHPLessThan(75),
             //    Target = new TargetAliveEnemy(),
             //});
-            level.enemy = new CharacterGroup(enemies.ToArray());
+            level.allCharacters.AddRange(enemies);
+            //level.enemy = new CharacterGroup(enemies.ToArray());
 
             var players = new List<Character>();
             for (var i = 0; i < 3; i++)
@@ -71,7 +79,8 @@ namespace ConsoleApplication3
 
             //players[0].APRechargeRate = 1.5f;
             players[players.Count - 1].ActionList.Insert(0, new Action2(Condition.AllyAnyLessThan50, new AbilityHeal()));
-            level.player = new CharacterGroup(players.ToArray());
+            level.allCharacters.AddRange(players);
+            //level.player = new CharacterGroup(players.ToArray());
         }
 
         /// <summary>
@@ -96,6 +105,7 @@ namespace ConsoleApplication3
             // TODO: Unload any non ContentManager content here
         }
 
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -106,15 +116,26 @@ namespace ConsoleApplication3
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
 
-            foreach (var enemy in level.enemy)
+            // TODO: Add your update logic here
+            var foes = level.Foes.Where(x => x.IsAlive).Count();
+            if (rand.Next(0, 6) > foes)
+            {
+                if (rand.NextFloat() < 0.05f + gameTime.TotalGameTime.TotalSeconds / 1000f)
+                {
+                    var ch = CreateEnemy("Enemy ");
+                    ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
+                    level.allCharacters.Add(ch);
+                }
+            }
+
+            foreach (var enemy in level.Foes)
             {
                 if (enemy.IsAlive)
                     enemy.Turn(level, (float)gameTime.ElapsedGameTime.TotalSeconds);
             }
 
-            foreach (var player in level.player)
+            foreach (var player in level.Allies)
             {
                 if (player.IsAlive)
                     player.Turn(level, (float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -122,7 +143,7 @@ namespace ConsoleApplication3
 
             var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             var chars = new List<Character>(level.Characters);
-            for (var i = 0; i < chars.Count;i++)
+            for (var i = 0; i < chars.Count; i++)
             {
                 for (var k = i + 1; k < chars.Count; k++)
                 {
@@ -159,10 +180,10 @@ namespace ConsoleApplication3
 
             spriteBatch.Begin();
 
-            foreach (var enemy in level.enemy)
+            foreach (var enemy in level.Foes)
                 enemy.Draw(spriteBatch);
 
-            foreach (var player in level.player)
+            foreach (var player in level.Allies)
                 player.Draw(spriteBatch);
 
             spriteBatch.End();

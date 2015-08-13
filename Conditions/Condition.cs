@@ -29,14 +29,14 @@ namespace ConsoleApplication3.Conditions
          * Abilities: Haste             -- have enough mp? already have haste?
          */
 
-        public static readonly Condition2 AllyAny = (l, c, a) => Any(l, c, a, l.Allies(c));
-        public static readonly Condition2 AllyAnyLessThan50 = (l, c, a) => Any(l, c, a, l.Allies(c).Where(x => x.HPPercent < 50));
-        public static readonly Condition2 FoeAny = (l, c, a) => Any(l, c, a, l.Foes(c));
-        public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.Foes(c).OrderBy(x => (c.Position - x.Position).LengthSquared()));
+        public static readonly Condition2 AllyAny = (l, c, a) => Any(l, c, a, l.IsAlly(c));
+        public static readonly Condition2 AllyAnyLessThan50 = (l, c, a) => Any(l, c, a, l.IsAlly(c).Where(x => x.HPPercent < 50));
+        public static readonly Condition2 FoeAny = (l, c, a) => Any(l, c, a, l.IsFoe(c));
+        public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.IsFoe(c).OrderBy(x => (c.Position - x.Position).LengthSquared()));
 
         public static bool FoePartyLeaderTarget(Level level, Character actor, Ability ability)
         {
-            var leader = level.player.PartyLeader;
+            var leader = level.Allies.Where(x => x.IsAlive).FirstOrDefault();
             if (leader == null)
                 return false;
 
