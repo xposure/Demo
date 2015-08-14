@@ -6,13 +6,13 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.xnb
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
 # Build results
-[Cc]ontent/
+[Cc]ontent/[Bb]in/
+[Cc]ontent/[Oo]bj/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
