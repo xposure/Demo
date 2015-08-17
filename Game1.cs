@@ -11,8 +11,9 @@ namespace ConsoleApplication3
 {
     /*
      * Animated Sprites - http://www.gamedev.net/topic/586876-pow-studios-free-sprite-animations/
-     * 
-     * 
+     * Tile Kit - https://www.youtube.com/watch?v=lnRRDSYgdmw
+     * Dungeon Crawl - http://opengameart.org/content/dungeon-crawl-32x32-tiles
+     * HUD - http://opengameart.org/content/shiny-hud
      */
 
     /// <summary>
