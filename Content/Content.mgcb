@@ -74,3 +74,9 @@
 /processorParam:TextureFormat=Color
 /build:Textures/fog5.png
 
+#begin Fonts/FiraSans.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/FiraSans.spritefont
+

@@ -95,7 +95,7 @@ namespace ConsoleApplication3
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            arialFont = Content.Load<SpriteFont>("Fonts/Arial");
+            arialFont = Content.Load<SpriteFont>("Fonts/FiraSans");
         }
 
         /// <summary>
@@ -188,6 +188,7 @@ namespace ConsoleApplication3
             foreach (var player in level.Allies)
                 player.Draw(spriteBatch);
 
+            spriteBatch.DrawString(arialFont, "Player 1 ... Charging ... Canceled", Vector2.Zero, Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
             spriteBatch.End();
 
             base.Draw(gameTime);
