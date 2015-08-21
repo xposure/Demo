@@ -15,6 +15,8 @@ namespace ConsoleApplication3
      * Dungeon Crawl - http://opengameart.org/content/dungeon-crawl-32x32-tiles
      * HUD - http://opengameart.org/content/shiny-hud
      * Tile Inspiration - http://www.david-amador.com/2013/12/quest-of-dungeons-development-update/
+     * Fonts - http://www.fontsquirrel.com/ - http://www.fontsquirrel.com/fonts/exo
+     * Sprite Inspiration - http://forums.terraria.org/index.php?threads/elemental.2304/
      */
 
     /// <summary>
