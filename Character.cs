@@ -63,7 +63,7 @@ namespace ConsoleApplication3
                 var action = ActionList[currentAction];
                 var ability = action.Ability;
 
-                LastAction = ability.GetType().Name + " " + currentTarget.Name;
+                LastAction = ability.Name;
 
                 var distance = Vector2.Distance(Position, currentTarget.Position);
                 if (distance > ability.MaxDistance)
@@ -139,6 +139,7 @@ namespace ConsoleApplication3
         public float APRechargeRate { get { return Stats.GetModifiedValue("speed"); } }
 
         public int APOver10 { get { return (int)(AP / 10); } }
+        public int APOver100 { get { return (int)(AP / 100); } }
 
         public int HPPercent { get { return (int)(100 * ((float)HP / (float)MaxHP)); } }
 

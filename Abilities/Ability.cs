@@ -11,6 +11,8 @@ namespace ConsoleApplication3.Abilities
         public float ChargeRate = 20;
         public int MaxDistance = 80;
 
+        public virtual string Name { get { return "Unknown"; } }
+
         public virtual bool CanUse(Level level, Character actor, Character target)
         {
             return false;

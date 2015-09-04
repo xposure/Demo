@@ -8,6 +8,15 @@ namespace ConsoleApplication3.Abilities
 {
     public class AbilityAttack : Ability
     {
+
+        public override string Name
+        {
+            get
+            {
+                return "Attack";
+            }
+        }
+
         public override bool CanUse(Level level, Character actor, Character target)
         {
             return target != null && target.IsAlive;

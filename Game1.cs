@@ -17,6 +17,26 @@ namespace ConsoleApplication3
      * Tile Inspiration - http://www.david-amador.com/2013/12/quest-of-dungeons-development-update/
      * Fonts - http://www.fontsquirrel.com/ - http://www.fontsquirrel.com/fonts/exo
      * Sprite Inspiration - http://forums.terraria.org/index.php?threads/elemental.2304/
+     * 
+     * Interesting drop off with - sin((x+1)^x) in range of 0..1
+     */
+
+
+    /*
+     * Stage 1
+     *   Showing Enemey Info
+     *   -Showing Party Info
+     *   Determining what is in the surrounding area
+     *   Controlling a Unit
+     *   Camera Work to Center on the target and player
+     *   
+     * Starge 2
+     *   Input Commands
+     *   Targeting Enemies
+     * 
+     * 
+     * 
+     * 
      */
 
     /// <summary>
@@ -82,7 +102,7 @@ namespace ConsoleApplication3
             }
 
             //players[0].APRechargeRate = 1.5f;
-            players[players.Count - 1].ActionList.Insert(0, new Action2(Condition.AllyAnyLessThan50, new AbilityHeal()));
+            players[players.Count - 1].ActionList.Insert(0, new Action2(Condition.AllyAnyLessThan80, new AbilityHeal()));
             level.allCharacters.AddRange(players);
             //level.player = new CharacterGroup(players.ToArray());
         }
@@ -123,9 +143,9 @@ namespace ConsoleApplication3
 
             // TODO: Add your update logic here
             var foes = level.Foes.Where(x => x.IsAlive).Count();
-            if (rand.Next(0, 6) > foes)
+            //if (rand.Next(0, 12) > foes)
             {
-                if (rand.NextFloat() < 0.05f + gameTime.TotalGameTime.TotalSeconds / 1000f)
+                if (rand.NextFloat() < 0.005f + gameTime.TotalGameTime.TotalSeconds * gameTime.TotalGameTime.TotalSeconds / 10000f / 60f)
                 {
                     var ch = CreateEnemy("Enemy ");
                     ch.ActionList.Add(new Action2(Condition.FoeNearest, new AbilityAttack()));
@@ -190,12 +210,67 @@ namespace ConsoleApplication3
             foreach (var player in level.Allies)
                 player.Draw(spriteBatch);
 
-            spriteBatch.DrawString(arialFont, "Player 1 ... Charging ... Canceled", Vector2.Zero, Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+
             spriteBatch.End();
+
+            DrawHUD();
 
             base.Draw(gameTime);
         }
 
+        private void DrawHUD()
+        {
+            spriteBatch.Begin();
+            var index = 0;
+            var scale = 1f;
+            var lineHeight = arialFont.LineSpacing * scale;
+            var meterHeight = 10;
+            var meterSize = new Vector2(100, 0);
+            var chargeMeterOffset = new Vector2(100, lineHeight * 0.5f) * scale;
+            var healthMeterOffset = new Vector2(225, lineHeight * 0.5f) * scale;
+            //var manaMeterOffset = new Vector2(350, lineHeight * 0.5f) * scale;
+            var actionTextOffset = new Vector2(350, 0) * scale;
+
+            var apLength = new Vector2(arialFont.MeasureString("AP: ").X, 0);
+
+            foreach (var player in level.Allies)
+            {
+                var linePosition = new Vector2(0, index * lineHeight);
+
+                spriteBatch.DrawString(arialFont, player.Name, linePosition, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+
+                spriteBatch.DrawLine(linePosition + chargeMeterOffset, linePosition + chargeMeterOffset + meterSize, Color.Gray, meterHeight);
+                spriteBatch.DrawLine(linePosition + chargeMeterOffset, linePosition + chargeMeterOffset + meterSize * (player.AP / 100f), Color.Green, meterHeight);
+
+                spriteBatch.DrawLine(linePosition + healthMeterOffset, linePosition + healthMeterOffset + meterSize, Color.Gray, meterHeight);
+                spriteBatch.DrawLine(linePosition + healthMeterOffset, linePosition + healthMeterOffset + meterSize * player.HPPercent / 100f, Color.Red, meterHeight);
+
+                spriteBatch.DrawString(arialFont, player.LastAction, linePosition + actionTextOffset, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+
+                index++;
+            }
+
+            index = 0;
+            scale = 0.75f;
+            var enemyHealth = new Vector2(100, 0);
+            foreach (var enemy in level.Foes)
+            {
+                if (enemy.IsAlive)
+                {
+                    var linePosition = new Vector2(0, index * lineHeight + 200);
+
+                    spriteBatch.DrawString(arialFont, enemy.Name, linePosition, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+
+                    spriteBatch.DrawLine(linePosition, linePosition + meterSize, Color.Gray, meterHeight);
+                    spriteBatch.DrawLine(linePosition, linePosition + meterSize * enemy.HPPercent / 100f, Color.Red, meterHeight);
+
+                    index++;
+                }
+            }
+
+            spriteBatch.End();
+
+        }
 
         public Character CreateEnemy(string name)
         {
@@ -203,7 +278,7 @@ namespace ConsoleApplication3
             {
                 Name = name,
                 Faction = Faction.Foe,
-                Position = new Vector2(rand.NextFloat(0, 25) + 25, rand.NextFloat(0, 600)),
+                Position = new Vector2(rand.NextFloat(0, 600), rand.NextFloat(0, 600)),
                 IsAlive = true
             };
 

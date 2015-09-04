@@ -8,6 +8,14 @@ namespace ConsoleApplication3.Abilities
 {
     public class AbilityHeal : Ability
     {
+        public override string Name
+        {
+            get
+            {
+                return "Heal";
+            }
+        }
+
         public override bool CanUse(Level level, Character actor, Character target)
         {
             return target.IsAlive;

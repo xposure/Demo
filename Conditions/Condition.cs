@@ -31,6 +31,7 @@ namespace ConsoleApplication3.Conditions
 
         public static readonly Condition2 AllyAny = (l, c, a) => Any(l, c, a, l.IsAlly(c));
         public static readonly Condition2 AllyAnyLessThan50 = (l, c, a) => Any(l, c, a, l.IsAlly(c).Where(x => x.HPPercent < 50));
+        public static readonly Condition2 AllyAnyLessThan80 = (l, c, a) => Any(l, c, a, l.IsAlly(c).Where(x => x.HPPercent < 80));
         public static readonly Condition2 FoeAny = (l, c, a) => Any(l, c, a, l.IsFoe(c));
         public static readonly Condition2 FoeNearest = (l, c, a) => Any(l, c, a, l.IsFoe(c).OrderBy(x => (c.Position - x.Position).LengthSquared()));
 
